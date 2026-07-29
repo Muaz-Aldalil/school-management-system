@@ -2,7 +2,8 @@ const CACHE_NAME = 'al-amiriya-v3';
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
-    importScripts('sw-manifest.js').catch(() => {}).then(() => {
+    Promise.resolve().then(() => {
+      try { importScripts('sw-manifest.js'); } catch {}
       const precache = self.__SW_MANIFEST || [];
       return caches.open(CACHE_NAME).then((cache) => {
         return cache.addAll(['/offline.html', ...precache]).catch(() => {});
