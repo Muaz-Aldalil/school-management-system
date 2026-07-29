@@ -14,14 +14,4 @@ function removeCrossOrigin() {
 
 export default defineConfig({
   plugins: [react(), tailwindcss(), removeCrossOrigin()],
-  build: {
-    rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-router-dom'],
-          supabase: ['@supabase/supabase-js'],
-        },
-      },
-    },
-  },
 });
