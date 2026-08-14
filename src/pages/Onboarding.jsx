@@ -47,7 +47,7 @@ export default function Onboarding() {
     setSaving(true);
     setError('');
     try {
-      const { data, error: rpcError } = await supabase.rpc('bootstrap_school', {
+      const { error: rpcError } = await supabase.rpc('bootstrap_school', {
         p_name: form.schoolName.trim(),
         p_name_en: form.schoolNameEn.trim() || '',
         p_address: form.schoolAddress.trim(),

@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { useMemo, useEffect } from 'react';
+import { useEffect } from 'react';
 import { useSchool } from '../context/SchoolContext';
 import { useAuth } from '../context/AuthContext';
 import { getScoreLabel, getGradeLabel, formatCurrency } from '../lib/utils';
@@ -18,7 +18,6 @@ export default function StudentDashboard() {
   const studentPayments = payments.filter(p => p.studentId === studentId);
   const avg = studentGrades.length ? Math.round(studentGrades.reduce((s, g) => s + g.score, 0) / studentGrades.length) : null;
   const best = studentGrades.length ? studentGrades.reduce((a, b) => a.score > b.score ? a : b) : null;
-  const paidCount = studentPayments.filter(p => p.status === 'Paid').length;
 
   useEffect(() => { if (studentId && !student?.photo) fetchStudentPhoto(studentId); }, [studentId, student?.photo, fetchStudentPhoto]);
 
@@ -70,7 +69,7 @@ export default function StudentDashboard() {
                   <tr className="border-b border-outline-variant text-[11px] font-semibold text-secondary uppercase">
                     <th className="px-2 py-2">{t('studentDashboard.subject')}</th>
                     <th className="px-2 py-2">{t('studentDashboard.score')}</th>
-                    <th className="px-2 py-2">{t('studentDashboard.grade')}</th>
+                    <th className="px-2 py-2">{t('studentDetails.grade')}</th>
                   </tr>
                 </thead>
                 <tbody className="text-sm">

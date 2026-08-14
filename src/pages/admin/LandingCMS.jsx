@@ -94,8 +94,8 @@ export default function LandingCMS() {
     <div className="p-4 md:p-6 max-w-5xl mx-auto space-y-8">
       <Reveal>
         <div>
-          <h2 className="text-headline-md text-on-background">{t('landingCMS.title')}</h2>
-          <p className="text-body-md text-secondary mt-1">{t('landingCMS.subtitle')}</p>
+          <h2 className="text-headline-md text-on-background">{t('landingCMS.pageTitle')}</h2>
+          <p className="text-body-md text-secondary mt-1">{t('landingCMS.pageSubtitle')}</p>
           <p className="text-xs text-primary mt-1 flex items-center gap-1"><Globe className="w-3 h-3" /> {t('landingCMS.editingLang', { lang: langLabel })}</p>
         </div>
       </Reveal>

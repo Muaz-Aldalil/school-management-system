@@ -201,7 +201,7 @@ export default function Students() {
         <StudentForm classes={isTeacher ? assignedClasses : undefined} onSubmit={async data => { try { await addStudent(data); setShowAdd(false); toast(t('students.added')); } catch (err) { toast(t('students.failedToAdd') + ': ' + (err?.message || err)); } }} onCancel={() => setShowAdd(false)} />
       </Modal>
       <Modal open={!!editingStudent} onClose={() => setEditingStudent(null)} title={t('students.editTitle')}>
-        {editingStudent && <StudentForm student={editingStudent} classes={isTeacher ? assignedClasses : undefined} onSubmit={async data => { try { await updateStudent(editingStudent.id, data); setEditingStudent(null); toast(t('students.updated')); } catch (err) { toast(t('students.failedToUpdate')); } }} onCancel={() => setEditingStudent(null)} />}
+        {editingStudent && <StudentForm student={editingStudent} classes={isTeacher ? assignedClasses : undefined} onSubmit={async data => { try { await updateStudent(editingStudent.id, data); setEditingStudent(null); toast(t('students.updated')); } catch { toast(t('students.failedToUpdate')); } }} onCancel={() => setEditingStudent(null)} />}
       </Modal>
       <Modal open={!!deletingStudent} onClose={() => setDeletingStudent(null)} title={t('students.deleteTitle')}>
         {deletingStudent && (
@@ -209,7 +209,7 @@ export default function Students() {
             <p className="text-sm text-secondary">{t('students.deleteConfirm', { name: deletingStudent.name })}</p>
             <div className="flex justify-end gap-3">
               <button onClick={() => setDeletingStudent(null)} className="px-4 py-2 border border-outline-variant rounded-lg text-sm text-on-surface hover:bg-surface-container-low transition-colors">{t('common.cancel')}</button>
-              <button onClick={async () => { try { await deleteStudent(deletingStudent.id); setDeletingStudent(null); toast(t('students.deleted')); } catch (err) { toast(t('students.failedToDelete')); } }} className="px-4 py-2 bg-error text-on-primary rounded-lg text-sm font-semibold hover:bg-error/90 transition-colors shadow-sm">{t('common.delete')}</button>
+              <button onClick={async () => { try { await deleteStudent(deletingStudent.id); setDeletingStudent(null); toast(t('students.deleted')); } catch { toast(t('students.failedToDelete')); } }} className="px-4 py-2 bg-error text-on-primary rounded-lg text-sm font-semibold hover:bg-error/90 transition-colors shadow-sm">{t('common.delete')}</button>
             </div>
           </div>
         )}

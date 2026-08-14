@@ -167,7 +167,7 @@ export function SchoolProvider({ children }) {
 
     load();
     return () => controller.abort();
-  }, [user?.id, user?.role]);
+  }, [user]);
 
   // --- Debounced IndexedDB cache save on every data change ---
   const saveRef = useRef(null);
@@ -226,7 +226,7 @@ export function SchoolProvider({ children }) {
       .subscribe();
 
     return () => { supabase.removeChannel(channel); };
-  }, [user?.id, user?.role, getStudentIdForUser]);
+  }, [user?.id, user?.role, user?.email, getStudentIdForUser]);
 
   const loadMore = useCallback(async () => {
     if (!hasMore || !supabase) return;

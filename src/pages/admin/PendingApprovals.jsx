@@ -1,5 +1,4 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Navigate } from 'react-router-dom';
 import { supabase } from '../../lib/supabase';
 import { useAuth } from '../../context/AuthContext';
 import { useToast } from '../../context/ToastContext';
@@ -7,11 +6,8 @@ import { useLanguage } from '../../context/LanguageContext';
 import { Clock, CheckCircle, Search, Mail, Shield } from 'lucide-react';
 import Reveal from '../../components/Reveal';
 
-const ROLE_KEYS = ['teacher', 'student', 'parent', 'accountant', 'supervisor'];
-
 export default function PendingApprovals() {
   const { user } = useAuth();
-  const navigate = useNavigate();
   const toast = useToast();
   const { t } = useLanguage();
   const [pending, setPending] = useState([]);

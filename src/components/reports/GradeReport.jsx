@@ -4,7 +4,7 @@ import { getArabicScore, formatDateSD } from '../../lib/utils';
 
 export default function GradeReport() {
   const { t } = useLanguage();
-  const { grades, students, schoolInfo } = useSchool();
+  const { grades, schoolInfo } = useSchool();
 
   const scores = grades.filter(g => typeof g.score === 'number');
   const avgScore = scores.length ? Math.round(scores.reduce((s, g) => s + g.score, 0) / scores.length) : 0;

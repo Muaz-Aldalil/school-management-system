@@ -40,19 +40,10 @@ export default function Settings() {
   const [saving, setSaving] = useState(false);
   const [logoBusy, setLogoBusy] = useState(false);
   const [systemStatus, setSystemStatus] = useState('checking');
-  const [online, setOnline] = useState(navigator.onLine);
   const [logoError, setLogoError] = useState(false);
   const logoInputRef = useRef(null);
 
   useEffect(() => { setForm(buildForm(schoolInfo, settings)); }, [schoolInfo, settings]);
-
-  useEffect(() => {
-    const on = () => setOnline(true);
-    const off = () => setOnline(false);
-    window.addEventListener('online', on);
-    window.addEventListener('offline', off);
-    return () => { window.removeEventListener('online', on); window.removeEventListener('offline', off); };
-  }, []);
 
   useEffect(() => {
     if (!dirty) return;
@@ -80,7 +71,7 @@ export default function Settings() {
     try {
       const url = await uploadSchoolLogo(file, schoolInfo.schoolId || form.schoolName);
       set('schoolLogoUrl', url);
-    } catch (err) {
+    } catch {
       toast(t('settings.logoUploadFailed'));
     } finally {
       setLogoBusy(false);
@@ -116,7 +107,7 @@ export default function Settings() {
       await saveSchoolInfo(info);
       setDirty(false);
       toast(t('settings.saved'));
-    } catch (err) {
+    } catch {
       toast(t('settings.saveFailed'));
     } finally {
       setSaving(false);

@@ -5,7 +5,6 @@ import { useLanguage } from '../../context/LanguageContext';
 import { localized } from '../../lib/localized';
 
 const ICONS = [Trophy, Medal, Award, Star, CheckCircle];
-const RANK = ['1st', '2nd', '3rd'];
 
 function Description({ text, expanded, onToggle }) {
   const { t, lang } = useLanguage();

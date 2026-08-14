@@ -16,9 +16,7 @@ export function AuthProvider({ children }) {
       const { data, error } = await supabase.from('profiles').select('*').eq('id', userId).single();
       if (error) return;
       setProfile(data || null);
-    } catch {
-
-    }
+    } catch { /* profile fetch is non-critical */ }
   }, []);
 
   useEffect(() => {
@@ -27,7 +25,7 @@ export function AuthProvider({ children }) {
       setSession(session);
       if (session?.user) {
         setUser(session.user);
-        try { await supabase.rpc('check_auto_approve'); } catch {}
+        try { await supabase.rpc('check_auto_approve'); } catch { /* auto-approve is best-effort */ }
         await fetchProfile(session.user.id);
       }
       setLoading(false);

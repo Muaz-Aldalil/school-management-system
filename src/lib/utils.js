@@ -90,7 +90,7 @@ export const SUDANESE_CURRICULUM = {
 
 const SUBJECT_KEYS = ['math', 'arabic', 'english', 'science', 'islamicStudies', 'history', 'geography', 'civics', 'pe', 'art'];
 
-export function getSubjectsForGrade(grade) {
+export function getSubjectsForGrade(_grade) {
   return SUDANESE_CURRICULUM['default'];
 }
 

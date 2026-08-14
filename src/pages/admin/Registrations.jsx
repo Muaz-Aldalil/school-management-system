@@ -90,7 +90,6 @@ export default function Registrations() {
     toast(t('registrations.statusUpdated'), 'success');
     if (detailTarget?.id === id) setDetailTarget(prev => ({ ...prev, status: newStatus }));
     const reg = registrations.find(r => r.id === id);
-    const statusLabel = newStatus === 'confirmed' ? t('registrations.confirmed') : newStatus === 'cancelled' ? t('registrations.cancelled') : t('registrations.pending');
     try { await sendNotification(t('notifications.registrationConfirmed').replace('{name}', reg?.student_name || ''), ['admin']); } catch { /* silent */ }
   }, [t, toast, detailTarget, registrations, sendNotification]);
 

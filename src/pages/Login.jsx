@@ -31,11 +31,6 @@ export default function Login() {
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
 
-  if (user && user.role !== 'pending') {
-    const dest = user.role === 'parent' ? '/parent' : user.role === 'student' ? '/student' : '/admin';
-    return <Navigate to={dest} replace />;
-  }
-
   const isPending = user && user.role === 'pending';
 
   useEffect(() => {
@@ -64,6 +59,11 @@ export default function Login() {
       setForm(f => ({ ...f, name: profile.name || '', email: user.email || '', phone: profile.phone || '' }));
     }
   }, [isPending, profile, user]);
+
+  if (user && user.role !== 'pending') {
+    const dest = user.role === 'parent' ? '/parent' : user.role === 'student' ? '/student' : '/admin';
+    return <Navigate to={dest} replace />;
+  }
 
   const handleSignIn = async (e) => {
     e.preventDefault();

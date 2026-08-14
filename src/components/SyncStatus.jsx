@@ -18,7 +18,7 @@ export default function SyncStatus() {
       try {
         const count = await getPendingCount();
         setPendingCount(count);
-      } catch {}
+      } catch { /* polling is best-effort */ }
     }, 5000);
     return () => clearInterval(interval);
   }, []);

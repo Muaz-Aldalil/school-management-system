@@ -5,7 +5,7 @@ import { useAuth } from '../../context/AuthContext';
 import { useSchool } from '../../context/SchoolContext';
 import { useToast } from '../../context/ToastContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { Shield, Search, Mail, Phone, Key, CheckCircle, Trash2 } from 'lucide-react';
+import { Shield, Search, Mail, Key, CheckCircle, Trash2 } from 'lucide-react';
 import { formatDate } from '../../lib/utils';
 import Reveal from '../../components/Reveal';
 

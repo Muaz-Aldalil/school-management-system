@@ -1,9 +1,9 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { supabase } from '../../lib/supabase';
 import { useToast } from '../../context/ToastContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { useSchool } from '../../context/SchoolContext';
-import { Shield, Key, Copy, CheckCircle, XCircle, Trash2, User, Mail } from 'lucide-react';
+import { Key, Copy, CheckCircle, XCircle, Trash2, User, Mail } from 'lucide-react';
 import { formatDate } from '../../lib/utils';
 import Reveal from '../../components/Reveal';
 
@@ -22,19 +22,19 @@ export default function Invitations() {
   const [targetName, setTargetName] = useState('');
   const [targetEmail, setTargetEmail] = useState('');
 
-  const load = () => {
+  const load = useCallback(() => {
     supabase.from('invitations').select('*').order('created_at', { ascending: false }).then(({ data }) => {
       if (data) setInvitations(data);
       setLoading(false);
     });
-  };
+  }, []);
 
   useEffect(() => {
     load();
     supabase.from('students').select('id, name, class').is('deleted_at', null).eq('school_id', schoolId).order('name').then(({ data }) => {
       if (data) setStudents(data);
     });
-  }, []);
+  }, [load, schoolId]);
 
   const generate = async () => {
     setGenerating(true);

@@ -2,13 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 
 export default function AnimatedCounter({ value, duration = 1200, prefix = '', suffix = '', decimals = 0 }) {
   const [display, setDisplay] = useState(0);
+  const displayRef = useRef(0);
   const rafRef = useRef(null);
   const startRef = useRef(null);
   const fromRef = useRef(0);
+  displayRef.current = display;
 
   useEffect(() => {
     if (typeof value !== 'number' || isNaN(value)) return;
-    fromRef.current = display;
+    fromRef.current = displayRef.current;
     startRef.current = null;
 
     const animate = (timestamp) => {

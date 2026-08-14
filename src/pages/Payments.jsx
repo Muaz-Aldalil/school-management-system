@@ -90,7 +90,7 @@ export default function Payments() {
                           ) : (
                             <>
                               <button onClick={() => toast(t('payments.invoiceDetails'))} className="p-1.5 text-secondary hover:text-primary rounded transition-colors"><Eye className="w-4 h-4" /></button>
-                               <button onClick={async () => { try { await updatePaymentStatus(p.id, 'Paid'); toast(t('payments.markedPaid')); } catch (err) { toast(t('payments.failedToUpdate')); } }} className="p-1.5 text-secondary hover:text-tertiary rounded transition-colors"><CheckCircle className="w-4 h-4" /></button>
+                               <button onClick={async () => { try { await updatePaymentStatus(p.id, 'Paid'); toast(t('payments.markedPaid')); } catch { toast(t('payments.failedToUpdate')); } }} className="p-1.5 text-secondary hover:text-tertiary rounded transition-colors"><CheckCircle className="w-4 h-4" /></button>
                               {p.status === 'Overdue' && <button onClick={() => toast(t('payments.reminderSent'))} className="p-1.5 text-secondary hover:text-primary rounded transition-colors"><Mail className="w-4 h-4" /></button>}
                             </>
                           )
@@ -114,14 +114,14 @@ export default function Payments() {
       </Reveal>
 
       <Modal open={showNewInvoice} onClose={() => setShowNewInvoice(false)} title={t('payments.newTitle')}>
-        <InvoiceForm students={students} onSubmit={async data => { try { await addPayment(data); setShowNewInvoice(false); toast(t('payments.created')); } catch (err) { toast(t('payments.failedToCreate')); } }} onCancel={() => setShowNewInvoice(false)} />
+        <InvoiceForm students={students} onSubmit={async data => { try { await addPayment(data); setShowNewInvoice(false); toast(t('payments.created')); } catch { toast(t('payments.failedToCreate')); } }} onCancel={() => setShowNewInvoice(false)} />
       </Modal>
       <Modal open={!!deletingPayment} onClose={() => setDeletingPayment(null)} title={t('payments.deleteConfirm', { student: deletingPayment?.student || '', amount: deletingPayment?.amount || 0 })}>
         <div className="space-y-4">
           <p className="text-sm text-secondary">{t('payments.deleteConfirm', { student: deletingPayment?.student || '', amount: deletingPayment?.amount || 0 })}</p>
           <div className="flex justify-end gap-3">
             <button onClick={() => setDeletingPayment(null)} className="px-4 py-2 border border-outline-variant rounded-lg text-sm text-on-surface hover:bg-surface-container-low transition-colors">{t('common.cancel')}</button>
-            <button onClick={async () => { try { await deletePayment(deletingPayment.id); toast(t('payments.deleted')); } catch (err) { toast(t('payments.failedToDelete')); } setDeletingPayment(null); }} className="px-4 py-2 bg-error text-on-primary rounded-lg text-sm font-semibold hover:bg-error/90 transition-colors shadow-sm">{t('common.delete')}</button>
+            <button onClick={async () => { try { await deletePayment(deletingPayment.id); toast(t('payments.deleted')); } catch { toast(t('payments.failedToDelete')); } setDeletingPayment(null); }} className="px-4 py-2 bg-error text-on-primary rounded-lg text-sm font-semibold hover:bg-error/90 transition-colors shadow-sm">{t('common.delete')}</button>
           </div>
         </div>
       </Modal>

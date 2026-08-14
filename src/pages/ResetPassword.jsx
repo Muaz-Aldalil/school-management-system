@@ -1,12 +1,11 @@
 import { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import { useLanguage } from '../context/LanguageContext';
 import { Key, School } from 'lucide-react';
 import SEO from '../components/SEO';
 
 export default function ResetPassword() {
-  const navigate = useNavigate();
   const { t } = useLanguage();
   const [password, setPassword] = useState('');
   const [submitting, setSubmitting] = useState(false);

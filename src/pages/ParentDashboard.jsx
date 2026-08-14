@@ -2,7 +2,7 @@ import { useMemo, useState, useEffect } from 'react';
 import { useSchool } from '../context/SchoolContext';
 import { useAuth } from '../context/AuthContext';
 import { getScoreLabel, getGradeLabel, formatCurrency } from '../lib/utils';
-import { Mail, Phone, MapPin, GraduationCap, Award, CreditCard, ChevronDown } from 'lucide-react';
+import { Mail, Phone, GraduationCap, Award, CreditCard, ChevronDown } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import Reveal from '../components/Reveal';
 

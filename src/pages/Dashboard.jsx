@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback, useRef, memo } from 'react';
+import { useState, useEffect, useMemo, useRef, memo } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -6,13 +6,13 @@ import { useSchool } from '../context/SchoolContext';
 import { useLanding } from '../context/LandingContext';
 import { supabase, dbAvailable } from '../lib/supabase';
 import { formatDate, formatTime, getScoreLabel, formatCurrency } from '../lib/utils';
-import { Users, UserCheck, AlertTriangle, Wallet, GraduationCap, Trophy, MoreHorizontal, Mail, Star, CreditCard, BarChart3, PieChart, TrendingUp, TrendingDown, Minus, Percent, Target, Sparkles } from 'lucide-react';
+import { Users, UserCheck, AlertTriangle, GraduationCap, Trophy, MoreHorizontal, Mail, Star, BarChart3, PieChart, TrendingUp, TrendingDown, Minus, Percent, Target, Sparkles } from 'lucide-react';
 import AnimatedCounter from '../components/AnimatedCounter';
 import Sparkline from '../components/Sparkline';
 import Reveal from '../components/Reveal';
 
 // ponytail: lightweight section error boundary — one per section, not one per chart
-import { Component } from 'react';
+import { Component, useContext } from 'react';
 import { LanguageContext } from '../context/LanguageContext';
 class SectionBoundary extends Component {
   state = { error: null };
@@ -138,7 +138,7 @@ export default function Dashboard() {
           <StatCard icon={Sparkles} label={t('dashboard2.newThisMonth')} value={stats.newThisMonth} trend={trends.newThisMonth} sparkline={sparkData.newThisMonth} color="tertiary" loading={loading} decimals={0} />
           <StatCard icon={GraduationCap} label={t('dashboard.faculty')} value={teachers.length} color="secondary" loading={loading} decimals={0} />
           {showPayments && <StatCard icon={AlertTriangle} label={t('dashboard.pendingPayments')} value={stats.pendingPayments} trend={trends.pendingPayments} sparkline={sparkData.pendingPayments} color="error" loading={loading} decimals={0} />}
-          {showPayments && <StatCard icon={Percent} label={t('dashboard2.collectionRate')} value={stats.collectionRate} suffix="%" trend={trends.collectionRate} sparkline={sparkData.collectionRate} color={stats.collectionRate >= 80 ? 'success' : stats.collectionRate >= 50 ? 'warning' : 'error'} loading={loading} decimals={0} showRate />}
+          {showPayments && <StatCard icon={Percent} label={t('dashboard2.collectionRate')} value={stats.collectionRate} suffix="%" trend={trends.collectionRate} sparkline={sparkData.collectionRate} color={stats.collectionRate >= 80 ? 'success' : stats.collectionRate >= 50 ? 'warning' : 'error'} loading={loading} decimals={0} />}
           {showPayments && <StatCard icon={Target} label={t('dashboard2.avgGrade')} value={stats.avgGrade} suffix="/100" trend={trends.avgGrade} sparkline={sparkData.avgGrade} color={stats.avgGrade >= 85 ? 'success' : stats.avgGrade >= 70 ? 'warning' : 'error'} loading={loading} decimals={0} />}
         </div>
       </Reveal>
@@ -165,7 +165,7 @@ export default function Dashboard() {
               <button className="text-primary hover:bg-surface-container-low p-1 rounded-full"><MoreHorizontal className="w-5 h-5" /></button>
             </div>
             <div className="p-4 space-y-3 flex-1">
-              {payments.slice(-5).reverse().map((p, i) => {
+              {payments.slice(-5).reverse().map(p => {
                 const s = studentMap[p.studentId];
                 const initials = s ? (s.name.split(' ')[0]?.[0] || '?') : '??';
                 return (
@@ -368,7 +368,8 @@ const GradeChart = memo(function GradeChart({ grades, t }) {
     </svg>
   );
 });
-function StatCard({ icon: Icon, label, value, trend, sparkline, color, loading, decimals = 0, prefix = '', suffix = '', showRate }) {
+function StatCard({ icon: Icon, label, value, trend, sparkline, color, loading, decimals = 0, prefix = '', suffix = '' }) {
+  const { t } = useContext(LanguageContext);
   const colorMap = {
     primary: { bg: 'bg-primary/5', icon: 'text-primary', ring: 'ring-primary/20' },
     secondary: { bg: 'bg-secondary/10', icon: 'text-secondary', ring: 'ring-secondary/20' },

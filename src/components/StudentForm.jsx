@@ -2,7 +2,6 @@ import { useState, useEffect } from 'react';
 import { useLanguage } from '../context/LanguageContext';
 import { Upload } from 'lucide-react';
 import { SUDANESE_GRADES } from '../lib/utils';
-import { isStorageUrl } from '../lib/storage';
 
 const MAX_FILE_SIZE = 2 * 1024 * 1024;
 
@@ -14,6 +13,7 @@ export default function StudentForm({ student, onSubmit, onCancel, classes }) {
   });
   const [preview, setPreview] = useState(null);
   const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
 
   useEffect(() => {
     if (student) {
@@ -38,14 +38,12 @@ export default function StudentForm({ student, onSubmit, onCancel, classes }) {
   const handlePhoto = e => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (file.size > MAX_FILE_SIZE) { alert('Photo must be under 2MB'); return; }
-    if (!file.type.startsWith('image/')) { alert('Please select an image file'); return; }
+    if (file.size > MAX_FILE_SIZE) { setError(t('studentForm.photoTooLarge')); return; }
+    if (!file.type.startsWith('image/')) { setError(t('studentForm.photoInvalid')); return; }
     const objectUrl = URL.createObjectURL(file);
     setForm(f => ({ ...f, photo: file }));
     setPreview(objectUrl);
   };
-
-  const [error, setError] = useState('');
 
   const submit = async e => {
     e.preventDefault();
@@ -102,7 +100,7 @@ export default function StudentForm({ student, onSubmit, onCancel, classes }) {
       </div>
       <div className="flex justify-end gap-3 pt-2">
         <button type="button" onClick={onCancel} className="px-4 py-2 border border-outline-variant rounded-lg text-sm text-on-surface hover:bg-surface-container-low transition-colors">{t('studentForm.cancel')}</button>
-        <button type="submit" className="px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-semibold hover:bg-primary-container transition-colors shadow-sm">{student ? t('studentForm.update') : t('studentForm.add')}</button>
+        <button type="submit" disabled={submitting} className="px-4 py-2 bg-primary text-on-primary rounded-lg text-sm font-semibold hover:bg-primary-container transition-colors shadow-sm disabled:opacity-60 disabled:cursor-not-allowed">{submitting ? t('common.saving') : (student ? t('studentForm.update') : t('studentForm.add'))}</button>
       </div>
     </form>
   );

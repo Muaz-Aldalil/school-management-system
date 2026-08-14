@@ -15,7 +15,7 @@ export default function StudentDetails() {
   const { t } = useLanguage();
   const { user } = useAuth();
   const { id } = useParams();
-  const { students, payments, grades, updateStudent, addGrade, updateGrade, deleteGrade, canEditGrade, getAssignedSubjects, getAssignedClasses, fetchStudentPhoto } = useSchool();
+  const { students, payments, grades, updateStudent, addGrade, updateGrade, deleteGrade, canEditGrade, getAssignedSubjects, fetchStudentPhoto } = useSchool();
   const student = students.find(s => s.id === id);
   const studentPayments = payments.filter(p => p.studentId === id);
   const studentGrades = grades.filter(g => g.studentId === id);
@@ -191,15 +191,15 @@ export default function StudentDetails() {
 
       <Modal open={!!editingStudent} onClose={() => setEditingStudent(null)} title={t('studentDetails.editTitle')}>
         {editingStudent && (
-          <StudentForm student={editingStudent} onSubmit={async data => { try { await updateStudent(editingStudent.id, data); setEditingStudent(null); toast(t('studentDetails.profileUpdated')); } catch (err) { toast(t('studentDetails.failedToUpdate')); } }} onCancel={() => setEditingStudent(null)} />
+          <StudentForm student={editingStudent} onSubmit={async data => { try { await updateStudent(editingStudent.id, data); setEditingStudent(null); toast(t('studentDetails.profileUpdated')); } catch { toast(t('studentDetails.failedToUpdate')); } }} onCancel={() => setEditingStudent(null)} />
         )}
       </Modal>
       <Modal open={showAddGrade} onClose={() => setShowAddGrade(false)} title={t('studentDetails.addGradeTitle')}>
-        <GradeForm gradeLevel={student.grade} subjects={user?.role === 'teacher' ? getAssignedSubjects() : undefined} onSubmit={async data => { try { await addGrade({ ...data, studentId: student.id }); setShowAddGrade(false); toast(t('studentDetails.gradeAdded')); } catch (err) { toast(t('studentDetails.failedToAddGrade')); } }} onCancel={() => setShowAddGrade(false)} />
+        <GradeForm gradeLevel={student.grade} subjects={user?.role === 'teacher' ? getAssignedSubjects() : undefined} onSubmit={async data => { try { await addGrade({ ...data, studentId: student.id }); setShowAddGrade(false); toast(t('studentDetails.gradeAdded')); } catch { toast(t('studentDetails.failedToAddGrade')); } }} onCancel={() => setShowAddGrade(false)} />
       </Modal>
       <Modal open={!!editingGrade} onClose={() => setEditingGrade(null)} title={t('studentDetails.editGradeTitle')}>
         {editingGrade && (
-          <GradeForm grade={editingGrade} subjects={user?.role === 'teacher' ? getAssignedSubjects() : undefined} onSubmit={async data => { try { await updateGrade(editingGrade.id, data); setEditingGrade(null); toast(t('studentDetails.gradeUpdated')); } catch (err) { toast(t('studentDetails.failedToUpdateGrade')); } }} onCancel={() => setEditingGrade(null)} />
+          <GradeForm grade={editingGrade} subjects={user?.role === 'teacher' ? getAssignedSubjects() : undefined} onSubmit={async data => { try { await updateGrade(editingGrade.id, data); setEditingGrade(null); toast(t('studentDetails.gradeUpdated')); } catch { toast(t('studentDetails.failedToUpdateGrade')); } }} onCancel={() => setEditingGrade(null)} />
         )}
       </Modal>
       <Modal open={!!deletingGrade} onClose={() => setDeletingGrade(null)} title={t('studentDetails.deleteGrade', { subject: deletingGrade?.subject || '' })}>
@@ -207,7 +207,7 @@ export default function StudentDetails() {
           <p className="text-sm text-secondary">{t('studentDetails.deleteGrade', { subject: deletingGrade?.subject || '' })}</p>
           <div className="flex justify-end gap-3">
             <button onClick={() => setDeletingGrade(null)} className="px-4 py-2 border border-outline-variant rounded-lg text-sm text-on-surface hover:bg-surface-container-low transition-colors">{t('common.cancel')}</button>
-            <button onClick={async () => { try { await deleteGrade(deletingGrade.id); toast(t('studentDetails.gradeDeleted')); } catch (err) { toast(t('studentDetails.failedToDeleteGrade')); } setDeletingGrade(null); }} className="px-4 py-2 bg-error text-on-primary rounded-lg text-sm font-semibold hover:bg-error/90 transition-colors shadow-sm">{t('common.delete')}</button>
+            <button onClick={async () => { try { await deleteGrade(deletingGrade.id); toast(t('studentDetails.gradeDeleted')); } catch { toast(t('studentDetails.failedToDeleteGrade')); } setDeletingGrade(null); }} className="px-4 py-2 bg-error text-on-primary rounded-lg text-sm font-semibold hover:bg-error/90 transition-colors shadow-sm">{t('common.delete')}</button>
           </div>
         </div>
       </Modal>

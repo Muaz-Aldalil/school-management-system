@@ -17,12 +17,12 @@ const THEME_KEYS = [
   { icon: 'text-amber-600', border: 'ring-amber-500/50', bg: 'bg-amber-600/10', text: 'text-amber-700', medalKey: 'honorMedal.bronze' },
 ];
 
-const RANK_LABELS = ['1st', '2nd', '3rd', '4th', '5th', '6th', '7th', '8th', '9th', '10th'];
-
 export default function HonorBoard() {
   const { honorBoard } = useLanding();
   const { students, grades } = useSchool();
   const { t, lang } = useLanguage();
+
+  const [showCongrat, setShowCongrat] = useState(null);
 
   const allEntries = honorBoard?.entries?.length
     ? honorBoard.entries.slice(0, 10)
@@ -33,7 +33,11 @@ export default function HonorBoard() {
       }).sort((a, b) => b.score - a.score).slice(0, 10);
   const podiumEntries = allEntries.slice(0, 3);
 
-  const [showCongrat, setShowCongrat] = useState(null);
+  useEffect(() => {
+    if (!showCongrat) return;
+    const timer = setTimeout(() => setShowCongrat(null), 3000);
+    return () => clearTimeout(timer);
+  }, [showCongrat]);
 
   if (allEntries.length === 0) return null;
 
@@ -53,12 +57,6 @@ export default function HonorBoard() {
     localStorage.setItem('honor_congrats', JSON.stringify(stored.slice(0, 50)));
     setShowCongrat({ student: student.name, rank });
   };
-
-  useEffect(() => {
-    if (!showCongrat) return;
-    const t = setTimeout(() => setShowCongrat(null), 3000);
-    return () => clearTimeout(t);
-  }, [showCongrat]);
 
   return (
     <>
