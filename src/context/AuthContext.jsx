@@ -73,12 +73,22 @@ export function AuthProvider({ children }) {
     return true;
   }, []);
 
-  const signUp = useCallback(async (email, password, name) => {
+  const signUp = useCallback(async (email, password, metadata = {}) => {
     setError(null);
     if (!dbAvailable) { setError('Service unavailable'); return null; }
-    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: { name } } });
-    if (error) { setError(error.message); return null; }
-    return data?.user || null;
+    const { data, error } = await supabase.auth.signUp({ email, password, options: { data: metadata } });
+    if (error) {
+      // 5xx responses are masked by auth-js as "{}" — surface a useful message instead.
+      const msg = error?.message;
+      if (!msg || msg === '{}' || msg === '[object Object]') {
+        console.error('signUp failed (raw error):', error);
+        setError('Unable to create account. Please try again.');
+      } else {
+        setError(msg);
+      }
+      return null;
+    }
+    return data || null;
   }, []);
 
   const resetPassword = useCallback(async (email) => {
@@ -87,7 +97,16 @@ export function AuthProvider({ children }) {
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: `${window.location.origin}/reset-password`,
     });
-    if (error) { setError(error.message); return false; }
+    if (error) {
+      const msg = error?.message;
+      if (!msg || msg === '{}' || msg === '[object Object]') {
+        console.error('resetPassword failed (raw error):', error);
+        setError('Unable to send reset link. Please try again.');
+      } else {
+        setError(msg);
+      }
+      return false;
+    }
     return true;
   }, []);
 

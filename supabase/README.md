@@ -18,7 +18,15 @@ Apply in this exact order:
 13. storage.sql                  — student-photos bucket + RLS policies
 14. registration_section.sql     — registration_requests table + seed classes
 15. security_fixes.sql           — RPC multi-tenancy fixes (run LAST)
+16. fix_signup_pending.sql       — Fix 500 on signup ("Database error saving new user", shown as {}):
+                                   role CHECK incl. pending/accountant/supervisor/worker,
+                                   invitation resolution in handle_new_user trigger,
+                                   robust audit trigger, check_invitation(p_code, p_email)
 ```
+
+> Note: the recorded order above predates `sudanization.sql` / `arabic_landing_content.sql` /
+> `fix_student_insert.sql` / `dashboard_snapshots.sql`. The exact order those ran in the live DB
+> is not tracked. `fix_signup_pending.sql` is written idempotently and safe to run at any point.
 
 Run each file in the Supabase SQL editor or via CLI:
 ```bash

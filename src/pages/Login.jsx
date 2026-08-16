@@ -28,16 +28,19 @@ export default function Login() {
 
   const [showForgot, setShowForgot] = useState(false);
   const [resetSent, setResetSent] = useState(false);
+  const [checkEmail, setCheckEmail] = useState(false);
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }));
 
   const isPending = user && user.role === 'pending';
 
+  const roleHome = (role) => (role === 'parent' ? '/parent' : role === 'student' ? '/student' : '/admin');
+
   useEffect(() => {
     if (!form.serial || form.serial.length < 5) { setSerialState('idle'); return; }
     const t = setTimeout(async () => {
       try {
-        const { data } = await supabase.rpc('check_invitation', { p_code: form.serial.trim() });
+        const { data } = await supabase.rpc('check_invitation', { p_code: form.serial.trim(), p_email: form.email || null });
         if (!data?.[0]?.valid) { setSerialState('invalid'); return; }
         setSerialState('valid');
         setSerialRole(data[0].role);
@@ -56,13 +59,23 @@ export default function Login() {
 
   useEffect(() => {
     if (isPending && profile) {
-      setForm(f => ({ ...f, name: profile.name || '', email: user.email || '', phone: profile.phone || '' }));
+      const m = profile.metadata || {};
+      setForm(f => ({
+        ...f,
+        name: profile.name || '',
+        email: user.email || '',
+        phone: profile.phone || m.phone || '',
+        role: m.intended_role || '',
+        classList: Array.isArray(m.classes) && m.classes.length ? m.classes : [''],
+        studentClass: m.class || '',
+        studentGrade: m.grade || '',
+        children: Array.isArray(m.children) && m.children.length ? m.children : [{ name: '', class: '' }],
+      }));
     }
   }, [isPending, profile, user]);
 
   if (user && user.role !== 'pending') {
-    const dest = user.role === 'parent' ? '/parent' : user.role === 'student' ? '/student' : '/admin';
-    return <Navigate to={dest} replace />;
+    return <Navigate to={roleHome(user.role)} replace />;
   }
 
   const handleSignIn = async (e) => {
@@ -96,36 +109,58 @@ export default function Login() {
     return true;
   };
 
+  const signupMeta = () => {
+    const meta = {
+      name: form.name,
+      role: form.role,
+      phone: form.phone,
+      serial: form.serial?.trim() || null,
+    };
+    if (form.role === 'teacher') meta.classes = form.classList.filter(Boolean);
+    if (form.role === 'student') { meta.class = form.studentClass; meta.grade = form.studentGrade; }
+    if (form.role === 'parent') meta.children = form.children?.filter(c => c.name.trim());
+    return meta;
+  };
+
   const handleSignUp = async (e) => {
     e.preventDefault();
     if (!form.role || submitting) return;
     if (form.role === 'teacher' && serialState !== 'valid') { setError(t('auth.teacherNeedsCode')); return; }
     if (form.role === 'parent' && !form.children?.some(c => c.name.trim())) { setError(t('auth.childRequired')); return; }
     if (form.password !== form.confirmPassword) { setError(t('auth.passwordsDontMatch')); return; }
-    setSubmitting(true); setError(null);
-    const userData = await signUp(form.email, form.password, form.name);
+    setSubmitting(true); setError(null); setCheckEmail(false);
+    const res = await signUp(form.email, form.password, signupMeta());
+    if (!res) { setSubmitting(false); return; }
+    const userData = res.user;
     if (!userData) { setSubmitting(false); return; }
-    for (let i = 0; i < 15; i++) {
+
+    if (!res.session) {
+      // Email confirmation is enabled: account exists, role is resolved server-side
+      // by the handle_new_user trigger. Ask the user to confirm their email.
+      setSubmitting(false);
+      reset();
+      setCheckEmail(true);
+      return;
+    }
+
+    // Autoconfirm mode: a session exists immediately. The trigger already set the
+    // profile role from the invitation code (or left it pending), so just confirm
+    // it and route accordingly.
+    for (let i = 0; i < 8; i++) {
       const { data: p } = await supabase.from('profiles').select('role').eq('id', userData.id).single();
       if (p) {
         if (p.role !== 'pending') {
           setSubmitting(false);
-          navigate(p.role === 'parent' ? '/parent' : p.role === 'student' ? '/student' : '/admin', { replace: true });
+          navigate(roleHome(p.role), { replace: true });
           return;
         }
         break;
       }
-      await new Promise(r => setTimeout(r, 300));
+      await new Promise(r => setTimeout(r, 250));
     }
-    const ok = await submitWithMetadata(userData.id);
     setSubmitting(false);
-    if (!ok) return;
     reset();
-    if (serialState === 'valid') {
-      navigate(form.role === 'parent' ? '/parent' : form.role === 'student' ? '/student' : '/admin', { replace: true });
-    } else {
-      setShowApprovalModal(true);
-    }
+    setShowApprovalModal(true);
   };
 
   const handleResetPassword = async (e) => {
@@ -332,9 +367,9 @@ export default function Login() {
           </div>
           <div className="bg-surface-container-lowest/70 backdrop-blur-xl border border-outline-variant rounded-2xl p-6 space-y-4 shadow-sm">
             <div className="flex gap-1 p-1 bg-surface-container-high rounded-lg">
-              <button onClick={() => { setTab('signin'); setError(null); }}
+              <button onClick={() => { setTab('signin'); setError(null); setCheckEmail(false); }}
                 className={`flex-1 py-2 text-sm font-semibold rounded-md transition-colors ${tab === 'signin' ? 'bg-surface text-primary shadow-sm' : 'text-secondary hover:text-on-surface'}`}>{t('auth.signIn')}</button>
-              <button onClick={() => { setTab('signup'); setError(null); }}
+              <button onClick={() => { setTab('signup'); setError(null); setCheckEmail(false); }}
                 className={`flex-1 py-2 text-sm font-semibold rounded-md transition-colors ${tab === 'signup' ? 'bg-surface text-primary shadow-sm' : 'text-secondary hover:text-on-surface'}`}>{t('auth.createAccount')}</button>
             </div>
 
@@ -423,12 +458,22 @@ export default function Login() {
 
             {tab === 'signup' && (
               <form onSubmit={handleSignUp} className="space-y-4">
-                {commonFields(true)}
-                <button type="submit" disabled={submitting}
-                  className="w-full h-11 bg-primary text-on-primary rounded-lg text-sm font-semibold hover:bg-primary-container transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-2">
-                  {submitting ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><UserPlus className="w-4 h-4" /> {t('auth.createBtn')}</>}
-                </button>
-                {error && <div className="bg-error/10 text-error text-sm px-4 py-2.5 rounded-lg" role="alert">{error}</div>}
+                {checkEmail ? (
+                  <div className="text-center py-4">
+                    <p className="text-sm text-secondary">{t('auth.checkEmailSignup')}</p>
+                    <button type="button" onClick={() => { setCheckEmail(false); setError(null); }}
+                      className="mt-4 text-sm text-primary hover:underline">{t('auth.backToSignIn')}</button>
+                  </div>
+                ) : (
+                  <>
+                    {commonFields(true)}
+                    <button type="submit" disabled={submitting}
+                      className="w-full h-11 bg-primary text-on-primary rounded-lg text-sm font-semibold hover:bg-primary-container transition-colors shadow-sm disabled:opacity-50 flex items-center justify-center gap-2">
+                      {submitting ? <span className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <><UserPlus className="w-4 h-4" /> {t('auth.createBtn')}</>}
+                    </button>
+                    {error && <div className="bg-error/10 text-error text-sm px-4 py-2.5 rounded-lg" role="alert">{error}</div>}
+                  </>
+                )}
               </form>
             )}
 
