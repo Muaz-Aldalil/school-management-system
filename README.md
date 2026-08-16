@@ -2,7 +2,7 @@
 
 Built this for Al-Amiriya School in Sudan. It handles students, grades, payments, and a public landing page — all in Arabic and English.
 
-Live at: [al-amriya.netlify.app](https://al-amriya.netlify.app)
+Live at: [al-amiriya-school.netlify.app](https://al-amiriya-school.netlify.app)
 
 ## What it does
 

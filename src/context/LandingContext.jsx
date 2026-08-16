@@ -93,7 +93,7 @@ const DEFAULT_ABOUT = {
 
 const DEFAULT_CONTACT = {
   phone: '+249 91 234 5678',
-  email: 'info@al-amriya.netlify.app',
+  email: 'info@al-amiriya-school.netlify.app',
   address: { ar: 'العامريه، الخرتوم', en: 'Al-Amiriya, Khartoum' },
 };
 

@@ -1,6 +1,6 @@
 import { openDB } from 'idb';
 
-const DB_NAME = 'al-amriya-offline';
+const DB_NAME = 'al-amiriya-school-offline';
 const DB_VERSION = 1;
 
 let dbPromise = null;

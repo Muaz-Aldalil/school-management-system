@@ -4,4 +4,4 @@ Disallow: /admin
 Disallow: /student
 Disallow: /parent
 
-Sitemap: https://al-amriya.netlify.app/sitemap.xml
+Sitemap: https://al-amiriya-school.netlify.app/sitemap.xml

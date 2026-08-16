@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 
 const SITE_NAME = 'مدرسه العامريه';
-const DOMAIN = 'https://al-amriya.netlify.app';
+const DOMAIN = 'https://al-amiriya-school.netlify.app';
 const DEFAULT_OG_IMAGE = `${DOMAIN}/og-image.png`;
 
 export default function SEO({
