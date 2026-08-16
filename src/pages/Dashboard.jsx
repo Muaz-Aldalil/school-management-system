@@ -269,7 +269,7 @@ export default function Dashboard() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
                       <p className="text-sm font-semibold text-on-background truncate">{localized(e.name, lang)}</p>
-                      <span className="text-[10px] font-medium text-secondary bg-surface-container-high px-1.5 py-0.5 rounded shrink-0">{e.grade}</span>
+                      <span className="text-[10px] font-medium text-secondary bg-surface-container-high px-1.5 py-0.5 rounded shrink-0">{localized(e.grade, lang)}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">
                       <div className="flex gap-0.5">
