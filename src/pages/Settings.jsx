@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { Building2, User, Bell, Shield, Save, Upload, Trash2, Download, Globe, Sun, Moon, Loader2, AlertTriangle, WifiOff } from 'lucide-react';
+import { Building2, User, Bell, Shield, Save, Upload, Trash2, Download, Sun, Moon, Loader2, AlertTriangle, WifiOff } from 'lucide-react';
 import { useSchool } from '../context/SchoolContext';
 import { useToast } from '../context/ToastContext';
 import { useLanguage } from '../context/LanguageContext';
@@ -33,7 +33,6 @@ export default function Settings() {
   const toast = useToast();
   const { t, lang } = useLanguage();
   const { theme, toggle: toggleTheme } = useTheme();
-  const { setLang } = useLanguage();
   const { saveSchoolInfo, schoolInfo, settings, students, grades, payments } = useSchool();
   const [form, setForm] = useState(() => buildForm(schoolInfo, settings));
   const [dirty, setDirty] = useState(false);
@@ -258,20 +257,13 @@ export default function Settings() {
             </div>
           </section></Reveal>
 
-          {/* Language & Theme */}
+          {/* Theme */}
           <Reveal delay={0.35}><section className="bg-surface-container-lowest rounded-xl border border-outline-variant p-6">
             <div className="flex items-center gap-2 border-b border-outline-variant pb-4 mb-4">
-              <Globe className="w-5 h-5 text-primary" />
-              <h3 className="text-headline-md text-on-background">{t('settings.language')} & {t('settings.theme')}</h3>
+              <Sun className="w-5 h-5 text-primary" />
+              <h3 className="text-headline-md text-on-background">{t('settings.theme')}</h3>
             </div>
             <div className="space-y-4">
-              <div>
-                <p className="text-xs font-semibold text-on-surface-variant mb-2">{t('settings.language')}</p>
-                <div className="flex gap-2">
-                  <PillButton active={lang === 'en'} onClick={() => setLang('en')}>English</PillButton>
-                  <PillButton active={lang === 'ar'} onClick={() => setLang('ar')}>{t('settings.languageArabic')}</PillButton>
-                </div>
-              </div>
               <div>
                 <p className="text-xs font-semibold text-on-surface-variant mb-2">{t('settings.theme')}</p>
                 <div className="flex gap-2">

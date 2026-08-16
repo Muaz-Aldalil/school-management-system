@@ -6,7 +6,11 @@ export function useNotifications(limit = 20) {
 
   const fetch = useCallback(async () => {
     if (!dbAvailable) return;
-    const local = JSON.parse(localStorage.getItem('honor_congrats') || '[]');
+    let local;
+    try {
+      local = JSON.parse(localStorage.getItem('honor_congrats') || '[]');
+      if (!Array.isArray(local)) local = [];
+    } catch { local = []; }
     const localNotifs = local.map((n, i) => ({
       id: `local-${i}`, message: n.message, created_at: new Date(n.at).toISOString(), read: false, isLocal: true,
     }));

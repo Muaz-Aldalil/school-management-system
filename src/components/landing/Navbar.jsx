@@ -7,7 +7,6 @@ import { localized } from '../../lib/localized';
 import { useLanding } from '../../context/LandingContext';
 import useTheme from '../../hooks/useTheme';
 import useActiveSection from '../../hooks/useActiveSection';
-import LangToggle from '../LangToggle';
 
 export default function Navbar() {
   const [open, setOpen] = useState(false);
@@ -52,7 +51,6 @@ export default function Navbar() {
           )}
         </div>
         <div className="hidden md:flex items-center gap-2">
-          <LangToggle />
           <button onClick={toggle} className="p-2.5 rounded-xl text-secondary hover:text-primary hover:bg-surface-container-low/50 backdrop-blur-sm transition-all" title={theme === 'light' ? t('nav.darkMode') : t('nav.lightMode')}>
             {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </button>
@@ -67,7 +65,6 @@ export default function Navbar() {
           )}
         </div>
         <div className="md:hidden flex items-center gap-2">
-          <LangToggle />
           <button onClick={toggle} className="p-2.5 rounded-xl text-secondary hover:text-primary hover:bg-surface-container-low/50 backdrop-blur-sm transition-all" title={theme === 'light' ? t('nav.darkMode') : t('nav.lightMode')}>
             {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
           </button>

@@ -51,7 +51,6 @@ export default function Landing() {
         jsonLd={schoolJsonLd}
         hreflang={[
           { lang: 'ar', href: '/' },
-          { lang: 'en', href: '/' },
         ]}
       />
       <Navbar />

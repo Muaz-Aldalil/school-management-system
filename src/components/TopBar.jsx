@@ -6,7 +6,6 @@ import { useLanguage } from '../context/LanguageContext';
 import { useNotifications } from '../hooks/useNotifications';
 import { formatDate, formatTime } from '../lib/utils';
 import useTheme from '../hooks/useTheme';
-import LangToggle from './LangToggle';
 
 export default function TopBar({ onMenuClick }) {
   const { user } = useAuth();
@@ -52,7 +51,6 @@ export default function TopBar({ onMenuClick }) {
           </form>
       </div>
       <div className="flex items-center gap-4 relative" ref={dropdownRef}>
-        <LangToggle />
         <button onClick={toggle} aria-label={theme === 'light' ? t('nav.darkMode') : t('nav.lightMode')} className="p-2 rounded-xl text-secondary hover:text-primary hover:bg-surface-container-low/50 transition-all" title={theme === 'light' ? t('nav.darkMode') : t('nav.lightMode')}>
           {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
         </button>

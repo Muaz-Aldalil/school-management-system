@@ -28,7 +28,7 @@ export default function Teachers() {
             <div key={teacher.id} className={`bg-surface-container-lowest/90 backdrop-blur-sm border border-outline-variant/30 rounded-xl text-center hover:shadow-lg transition-all duration-300 hover:-translate-y-0.5 group ${dense ? 'p-4' : 'p-6'}`}>
               <div className={`rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center mx-auto mb-3 group-hover:from-primary/30 group-hover:to-primary/10 transition-all duration-300 shadow-sm ${dense ? 'w-14 h-14' : 'w-20 h-20'}`}>
                 {teacher.image ? (
-                  <img src={teacher.image} alt={localized(teacher.name, lang)} loading="lazy" className="w-full h-full object-cover" />
+                  <img src={teacher.image} alt={localized(teacher.name, lang)} loading="lazy" className="w-full h-full object-cover object-top" />
                 ) : (
                   <span className={`font-bold text-primary ${dense ? 'text-lg' : 'text-2xl'}`}>{localized(teacher.name, lang).split(' ').map(n => n[0]).join('')}</span>
                 )}

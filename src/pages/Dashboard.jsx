@@ -6,6 +6,7 @@ import { useSchool } from '../context/SchoolContext';
 import { useLanding } from '../context/LandingContext';
 import { supabase, dbAvailable } from '../lib/supabase';
 import { formatDate, formatTime, getScoreLabel, formatCurrency } from '../lib/utils';
+import { localized } from '../lib/localized';
 import { Users, UserCheck, AlertTriangle, GraduationCap, Trophy, MoreHorizontal, Mail, Star, BarChart3, PieChart, TrendingUp, TrendingDown, Minus, Percent, Target, Sparkles } from 'lucide-react';
 import AnimatedCounter from '../components/AnimatedCounter';
 import Sparkline from '../components/Sparkline';
@@ -261,13 +262,13 @@ export default function Dashboard() {
               {entries.length === 0 ? (
                 <p className="text-sm text-secondary py-2">{t('dashboard.noHonorBoard')}</p>
               ) : entries.map((e, i) => (
-                <div key={e.name + i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-container-low transition-colors -mx-2">
+                <div key={localized(e.name, lang) + i} className="flex items-center gap-3 p-2 rounded-lg hover:bg-surface-container-low transition-colors -mx-2">
                   <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xs font-bold shrink-0 ${i === 0 ? 'bg-yellow-500/15 text-yellow-600' : i === 1 ? 'bg-gray-400/15 text-gray-500' : 'bg-amber-600/15 text-amber-700'}`}>
-                    {e.name.split(' ').map(n => n[0]).join('')}
+                    {localized(e.name, lang).split(' ').map(n => n[0]).join('')}
                   </div>
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2">
-                      <p className="text-sm font-semibold text-on-background truncate">{e.name}</p>
+                      <p className="text-sm font-semibold text-on-background truncate">{localized(e.name, lang)}</p>
                       <span className="text-[10px] font-medium text-secondary bg-surface-container-high px-1.5 py-0.5 rounded shrink-0">{e.grade}</span>
                     </div>
                     <div className="flex items-center gap-2 mt-0.5">

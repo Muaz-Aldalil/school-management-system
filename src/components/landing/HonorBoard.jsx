@@ -93,7 +93,7 @@ export default function HonorBoard() {
                       {t(theme.medalKey)}
                     </div>
                     <p className={`${i === 0 ? 'text-lg' : 'text-base'} font-bold text-on-background`}>{localized(entry.name, lang)}</p>
-                    <p className="text-xs text-secondary mt-0.5">{t('honorBoard.grade')} {entry.grade} &middot; {entry.class}</p>
+                    <p className="text-xs text-secondary mt-0.5">{t('honorBoard.grade')} {localized(entry.grade, lang)} &middot; {entry.class}</p>
                     <div className={`mt-3 pt-2 border-t border-outline-variant ${theme.bg} -mx-4 px-4 pb-0`}>
                       <div className="flex items-start justify-center gap-0.5">
                         <span className={`${i === 0 ? 'text-2xl' : 'text-xl'} font-bold leading-none ${theme.text || 'text-primary'} drop-shadow-sm`}>{entry.score}</span>
@@ -146,7 +146,7 @@ export default function HonorBoard() {
                     </div>
 
                     <p className={`${isFirst ? 'text-xl md:text-2xl' : 'text-lg md:text-xl'} font-bold text-on-background`}>{localized(entry.name, lang)}</p>
-                    <p className="text-sm text-secondary mt-0.5">{t('honorBoard.grade')} {entry.grade} &middot; {entry.class}</p>
+                    <p className="text-sm text-secondary mt-0.5">{t('honorBoard.grade')} {localized(entry.grade, lang)} &middot; {entry.class}</p>
 
                     <div className={`mt-4 pt-3 border-t border-outline-variant ${theme.bg} -mx-6 md:-mx-8 px-6 md:px-8 pb-0`}>
                       <div className="flex items-start justify-center gap-0.5">

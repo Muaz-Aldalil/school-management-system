@@ -32,7 +32,7 @@ export default function Sidebar({ open, onClose }) {
             <p className="text-caption-xs text-secondary">{t('sidebar.managementSystem')}</p>
           </div>
         </NavLink>
-        <nav className="flex-1 px-3 space-y-1">
+        <nav className="flex-1 overflow-y-auto scrollbar-hide px-3 space-y-1">
           <NavLink to="/admin" end onClick={onClose} className={linkClass}>
             <LayoutDashboard className="w-5 h-5" /> {t('sidebar.dashboard')}
           </NavLink>

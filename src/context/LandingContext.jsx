@@ -2,6 +2,28 @@ import { createContext, useContext, useState, useEffect, useCallback, useRef } f
 import { supabase, dbAvailable } from '../lib/supabase';
 import { useAuth } from './AuthContext';
 import { t } from '../lib/i18n';
+import { normalizeSchoolNameDeep } from '../lib/constants';
+import { enqueue, removeByTableAndRecord } from '../lib/sync-engine';
+
+const toText = (field) => (typeof field === 'string' ? field : field?.ar || field?.en || '');
+
+// Merges stored content over the Arabic defaults. Plain strings from the old
+// (English) data model are kept as the `en` value while the Arabic default is
+// preserved, so the Arabic-only UI always renders Arabic text.
+export function arabize(defaults, loaded) {
+  if (loaded === undefined || loaded === null) return defaults;
+  if (Array.isArray(defaults)) {
+    if (!Array.isArray(loaded)) return defaults;
+    return loaded.map((v, i) => arabize(defaults[i % defaults.length], v));
+  }
+  if (typeof defaults === 'object' && defaults !== null) {
+    if (typeof loaded === 'object' && loaded !== null && !Array.isArray(loaded)) {
+      return Object.fromEntries(Object.entries(defaults).map(([k, def]) => [k, arabize(def, loaded[k])]));
+    }
+    return { ...defaults, en: loaded };
+  }
+  return loaded;
+}
 
 const LandingContext = createContext(null);
 
@@ -28,20 +50,37 @@ const DEFAULT_ACHIEVEMENTS = [
   { id: 3, title: { ar: 'جائزة المدرسة الخضراء', en: 'Green School Award' }, description: { ar: 'تم التعرف على التميز في التعليم البيئي والاستدامة.', en: 'Recognized for excellence in environmental education and sustainability.' }, date: '2025-12-10', image: null },
 ];
 
+const TEACHERS_VERSION = 3;
+
 const DEFAULT_TEACHERS = [
-  { id: 1, name: { ar: 'الأستاذ محمد أحمد', en: 'Mr. Mohammed Ahmed' }, subject: { ar: 'الرياضيات', en: 'Mathematics' }, bio: { ar: 'خبرة 15 عاماً في التدريس. شغوف بجعل الرياضيات ممتعة.', en: '15 years of teaching experience. Passionate about making math fun.' }, image: null },
-  { id: 2, name: { ar: 'الأستاذة فاطمة علي', en: 'Ms. Fatima Ali' }, subject: { ar: 'العلوم', en: 'Science' }, bio: { ar: 'عالمة أبحاث سابرة تحولت إلى معلمة. تحب التجارب العملية.', en: 'Former researcher turned educator. Loves hands-on experiments.' }, image: null },
-  { id: 3, name: { ar: 'الأستاذة خديجة حسن', en: 'Ms. Khadija Hassan' }, subject: { ar: 'اللغة العربية', en: 'Arabic Language' }, bio: { ar: 'كاتبة منشئة ومعلمة أدب متفانية.', en: 'Creative writer and dedicated literature teacher.' }, image: null },
-  { id: 4, name: { ar: 'الأستاذ عمر محمد', en: 'Mr. Omar Mohammed' }, subject: { ar: 'علوم الحاسب', en: 'Computer Science' }, bio: { ar: 'خبير في صناعة التكنولوجيا. يعلم البرمجة والثقافة الرقمية.', en: 'Tech industry expert. Teaches programming and digital literacy.' }, image: null },
+  { id: 8, name: { ar: 'علاء الدين مسعود خلف الله', en: 'علاء الدين مسعود خلف الله' }, subject: { ar: '', en: '' }, bio: { ar: '', en: '' }, image: '/teachers/علاء الدين مسعود خلف الله.jpeg', sort_order: 1 },
+  { id: 1, name: { ar: 'هاجر', en: 'هاجر' }, subject: { ar: '', en: '' }, bio: { ar: '', en: '' }, image: '/teachers/هاجر.jpeg', sort_order: 2 },
+  { id: 2, name: { ar: 'إيمان', en: 'إيمان' }, subject: { ar: '', en: '' }, bio: { ar: '', en: '' }, image: '/teachers/إيمان.jpeg', sort_order: 3 },
+  { id: 3, name: { ar: 'حسين أحمد', en: 'حسين أحمد' }, subject: { ar: '', en: '' }, bio: { ar: '', en: '' }, image: '/teachers/حسين أحمد.jpeg', sort_order: 4 },
+  { id: 4, name: { ar: 'حليمه يوسف', en: 'حليمه يوسف' }, subject: { ar: 'علوم اتصالات', en: 'Communication Sciences' }, bio: { ar: '', en: '' }, image: '/teachers/حليمه يوسف علوم اتصالات.jpeg', sort_order: 5 },
+  { id: 5, name: { ar: 'حواء', en: 'حواء' }, subject: { ar: '', en: '' }, bio: { ar: '', en: '' }, image: '/teachers/حواء.jpeg', sort_order: 6 },
+  { id: 6, name: { ar: 'ستنا', en: 'ستنا' }, subject: { ar: '', en: '' }, bio: { ar: '', en: '' }, image: '/teachers/ستنا.jpeg', sort_order: 7 },
+  { id: 7, name: { ar: 'سهام', en: 'سهام' }, subject: { ar: '', en: '' }, bio: { ar: '', en: '' }, image: '/teachers/سهام.jpeg', sort_order: 8 },
+  { id: 9, name: { ar: 'فاطمة احمد', en: 'فاطمة احمد' }, subject: { ar: '', en: '' }, bio: { ar: '', en: '' }, image: '/teachers/فاطمة احمد.jpeg', sort_order: 9 },
+  { id: 10, name: { ar: 'كوثر', en: 'كوثر' }, subject: { ar: '', en: '' }, bio: { ar: '', en: '' }, image: '/teachers/كوثر.jpeg', sort_order: 10 },
+  { id: 11, name: { ar: 'منال', en: 'منال' }, subject: { ar: '', en: '' }, bio: { ar: '', en: '' }, image: '/teachers/منال.jpeg', sort_order: 11 },
+  { id: 12, name: { ar: 'مني إبراهيم دوشي', en: 'مني إبراهيم دوشي' }, subject: { ar: '', en: '' }, bio: { ar: '', en: '' }, image: '/teachers/مني إبراهيم دوشي.jpeg', sort_order: 12 },
+  { id: 13, name: { ar: 'نخا الجنان', en: 'نخا الجنان' }, subject: { ar: '', en: '' }, bio: { ar: '', en: '' }, image: '/teachers/نخا الجنان.jpeg', sort_order: 13 },
 ];
 
 const DEFAULT_HERO = {
   title: { ar: 'مدرسه العامريه', en: 'Al-Amiriya School' },
-  subtitle: { ar: 'نرعى العقول، نبني المستقبل — حيث يتفوق كل طالب.', en: 'Nurturing minds, building futures — where every student excels.' },
+  subtitle: { ar: 'نرعى العقول، نبني المستقبل', en: 'Nurturing minds, building futures' },
   cta_text: { ar: 'اعرف المزيد', en: 'Learn More' },
   cta_link: '#about',
   video_url: '',
   image_url: '',
+  stats: [
+    { value: 1245, label: { ar: 'الطلاب', en: 'Students' } },
+    { value: 85, label: { ar: 'المعلمين', en: 'Teachers' } },
+    { value: 28, label: { ar: 'الجوائز', en: 'Awards' } },
+    { value: 52, label: { ar: 'سنوات', en: 'Years' } },
+  ],
 };
 
 const DEFAULT_ABOUT = {
@@ -76,9 +115,9 @@ const DEFAULT_REGISTRATION = {
 
 const DEFAULT_HONOR_BOARD = {
   entries: [
-    { name: { ar: 'أحمد محمد علي', en: 'Ahmed Mohammed Ali' }, grade: 'التاسع', class: '9A', score: 95, rank: 'الأول', medal: 'الميدالية الذهبية' },
-    { name: { ar: 'سارة عبدالله حسن', en: 'Sara Abdullah Hassan' }, grade: 'التاسع', class: '9A', score: 81, rank: 'الثاني', medal: 'الميدالية الفضية' },
-    { name: { ar: 'محمد إبراهيم خالد', en: 'Mohammed Ibrahim Khaled' }, grade: 'السادس', class: '6B', score: 92, rank: 'الثالث', medal: 'الميدالية البرونزية' },
+    { name: { ar: 'أحمد محمد علي', en: 'Ahmed Mohammed Ali' }, grade: { ar: 'التاسع', en: '9th' }, class: '9A', score: 95, rank: 'الأول', medal: 'الميدالية الذهبية' },
+    { name: { ar: 'سارة عبدالله حسن', en: 'Sara Abdullah Hassan' }, grade: { ar: 'التاسع', en: '9th' }, class: '9A', score: 81, rank: 'الثاني', medal: 'الميدالية الفضية' },
+    { name: { ar: 'محمد إبراهيم خالد', en: 'Mohammed Ibrahim Khaled' }, grade: { ar: 'السادس', en: '6th' }, class: '6B', score: 92, rank: 'الثالث', medal: 'الميدالية البرونزية' },
   ],
 };
 
@@ -89,10 +128,23 @@ function loadFromStorage(defaultValue, key) {
     const stored = localStorage.getItem(LANDING_STORAGE_KEY);
     if (stored) {
       const parsed = JSON.parse(stored);
-      return parsed[key] !== undefined ? parsed[key] : defaultValue;
+      if (parsed[key] !== undefined) return normalizeSchoolNameDeep(parsed[key]);
     }
   } catch { /* silent */ }
   return defaultValue;
+}
+
+function loadTeachers() {
+  try {
+    const stored = localStorage.getItem(LANDING_STORAGE_KEY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed.teachersVersion === TEACHERS_VERSION && Array.isArray(parsed.teachers)) {
+        return normalizeSchoolNameDeep(parsed.teachers);
+      }
+    }
+  } catch { /* silent */ }
+  return DEFAULT_TEACHERS;
 }
 
 function saveAllToStorage(data) {
@@ -105,11 +157,11 @@ export function LandingProvider({ children }) {
   const [sections, setSections] = useState(() => loadFromStorage(DEFAULT_SECTIONS, 'sections'));
   const [events, setEvents] = useState(() => loadFromStorage(DEFAULT_EVENTS, 'events'));
   const [achievements, setAchievements] = useState(() => loadFromStorage(DEFAULT_ACHIEVEMENTS, 'achievements'));
-  const [teachers, setTeachers] = useState(() => loadFromStorage(DEFAULT_TEACHERS, 'teachers'));
-  const [hero, setHero] = useState(() => loadFromStorage(DEFAULT_HERO, 'hero'));
-  const [about, setAbout] = useState(() => loadFromStorage(DEFAULT_ABOUT, 'about'));
-  const [honorBoard, setHonorBoard] = useState(() => loadFromStorage(DEFAULT_HONOR_BOARD, 'honorBoard'));
-  const [contact, setContact] = useState(() => loadFromStorage(DEFAULT_CONTACT, 'contact'));
+  const [teachers, setTeachers] = useState(loadTeachers);
+  const [hero, setHero] = useState(() => arabize(DEFAULT_HERO, loadFromStorage(DEFAULT_HERO, 'hero')));
+  const [about, setAbout] = useState(() => arabize(DEFAULT_ABOUT, loadFromStorage(DEFAULT_ABOUT, 'about')));
+  const [honorBoard, setHonorBoard] = useState(() => arabize(DEFAULT_HONOR_BOARD, loadFromStorage(DEFAULT_HONOR_BOARD, 'honorBoard')));
+  const [contact, setContact] = useState(() => arabize(DEFAULT_CONTACT, loadFromStorage(DEFAULT_CONTACT, 'contact')));
   const [registration, setRegistration] = useState(() => loadFromStorage(DEFAULT_REGISTRATION, 'registration'));
   const [loading, setLoading] = useState(false);
 
@@ -140,10 +192,13 @@ export function LandingProvider({ children }) {
         const honorBoardData = contentRes.data.find(c => c.key === 'honor_board');
         const contactData = contentRes.data.find(c => c.key === 'contact');
         const registrationData = contentRes.data.find(c => c.key === 'registration');
-        if (heroData) setHero(prev => ({ ...prev, ...heroData.content }));
-        if (aboutData) setAbout(prev => ({ ...prev, ...aboutData.content }));
-        if (honorBoardData) setHonorBoard(prev => ({ ...prev, ...honorBoardData.content }));
-        if (contactData) setContact(prev => ({ ...prev, ...contactData.content }));
+        if (heroData) {
+          const heroContent = normalizeSchoolNameDeep(heroData.content);
+          setHero(prev => ({ ...prev, ...arabize(DEFAULT_HERO, heroContent) }));
+        }
+        if (aboutData) setAbout(prev => ({ ...prev, ...arabize(DEFAULT_ABOUT, aboutData.content) }));
+        if (honorBoardData) setHonorBoard(prev => ({ ...prev, ...arabize(DEFAULT_HONOR_BOARD, honorBoardData.content) }));
+        if (contactData) setContact(prev => ({ ...prev, ...arabize(DEFAULT_CONTACT, contactData.content) }));
         if (registrationData) setRegistration(prev => ({ ...prev, ...registrationData.content }));
       }
       setLoading(false);
@@ -151,18 +206,20 @@ export function LandingProvider({ children }) {
     Promise.all([
       supabase.from('events').select('*').order('date'),
       supabase.from('achievements').select('*').order('date', { ascending: false }),
-      supabase.from('teachers').select('*'),
-    ]).then(([eventsRes, achievementsRes, teachersRes]) => {
+    ]).then(([eventsRes, achievementsRes]) => {
       if (controller.signal.aborted) return;
       if (eventsRes.data && eventsRes.data.length) setEvents(eventsRes.data);
       if (achievementsRes.data && achievementsRes.data.length) setAchievements(achievementsRes.data);
-      if (teachersRes.data && teachersRes.data.length) setTeachers(teachersRes.data);
+    }).catch(() => {});
+    supabase.from('teachers').select('*').order('sort_order').then(res => {
+      if (controller.signal.aborted) return;
+      if (res.data && res.data.length) setTeachers(res.data);
     }).catch(() => {});
     return () => controller.abort();
   }, []);
 
   useEffect(() => {
-    debouncedSave({ sections, events, achievements, teachers, hero, about, honorBoard, contact, registration });
+    debouncedSave({ ...{ sections, events, achievements, teachers, hero, about, honorBoard, contact, registration }, teachersVersion: TEACHERS_VERSION });
     return () => { if (saveTimeoutRef.current) clearTimeout(saveTimeoutRef.current); };
   }, [sections, events, achievements, teachers, hero, about, honorBoard, contact, registration, debouncedSave]);
 
@@ -275,26 +332,57 @@ export function LandingProvider({ children }) {
   }, [isAdmin, notify]);
 
   const addTeacher = useCallback(async (teacher) => {
-    if (!dbAvailable || !isAdmin) { setTeachers(prev => [...prev, { ...teacher, id: Date.now() }]); return; }
-    const { data, error } = await supabase.from('teachers').insert(teacher).select().single();
-    if (error) return;
-    if (data) setTeachers(prev => [...prev, data]);
-    try { await notify(t('notifications.teacherAdded')); } catch { /* silent */ }
+    const clientId = crypto.randomUUID();
+    const now = new Date().toISOString();
+    const optimistic = { id: clientId, name: teacher.name, subject: teacher.subject, bio: teacher.bio, image: teacher.image || '', created_at: now };
+    setTeachers(prev => [...prev, optimistic]);
+    if (!dbAvailable || !isAdmin) return;
+    const row = { name: toText(teacher.name), subject: toText(teacher.subject), bio: toText(teacher.bio), image: teacher.image || '' };
+    await enqueue({ table: 'teachers', operation: 'insert', data: row, recordId: clientId, baseVersion: now });
+    if (navigator.onLine && supabase) {
+      try {
+        const { data: created, error } = await supabase.from('teachers').insert(row).select().single();
+        if (error) throw error;
+        if (created) {
+          setTeachers(prev => prev.map(t => t.id === clientId ? created : t));
+          await removeByTableAndRecord('teachers', clientId);
+          try { await notify(t('notifications.teacherAdded')); } catch { /* silent */ }
+        }
+      } catch { /* silent */ }
+    }
   }, [notify, isAdmin]);
 
   const updateTeacher = useCallback(async (id, updates) => {
     setTeachers(prev => prev.map(t => t.id === id ? { ...t, ...updates } : t));
     if (!dbAvailable || !isAdmin) return;
-    const { error } = await supabase.from('teachers').update(updates).eq('id', id);
-    if (error) return;
+    const row = {};
+    if (updates.name !== undefined) row.name = toText(updates.name);
+    if (updates.subject !== undefined) row.subject = toText(updates.subject);
+    if (updates.bio !== undefined) row.bio = toText(updates.bio);
+    if (updates.image !== undefined) row.image = updates.image || '';
+    if (!Object.keys(row).length) return;
+    await enqueue({ table: 'teachers', operation: 'update', data: row, recordId: id, baseVersion: new Date().toISOString() });
+    if (navigator.onLine && supabase) {
+      try {
+        const { error } = await supabase.from('teachers').update(row).eq('id', id);
+        if (error) throw error;
+        await removeByTableAndRecord('teachers', id);
+      } catch { /* silent */ }
+    }
   }, [isAdmin]);
 
   const deleteTeacher = useCallback(async (id) => {
     setTeachers(prev => prev.filter(t => t.id !== id));
     if (!dbAvailable || !isAdmin) return;
-    const { error } = await supabase.from('teachers').delete().eq('id', id);
-    if (error) return;
-    try { await notify(t('notifications.teacherDeleted')); } catch { /* silent */ }
+    await enqueue({ table: 'teachers', operation: 'delete', data: {}, recordId: id, baseVersion: new Date().toISOString() });
+    if (navigator.onLine && supabase) {
+      try {
+        const { error } = await supabase.from('teachers').delete().eq('id', id);
+        if (error) throw error;
+        await removeByTableAndRecord('teachers', id);
+        try { await notify(t('notifications.teacherDeleted')); } catch { /* silent */ }
+      } catch { /* silent */ }
+    }
   }, [isAdmin, notify]);
 
   return <LandingContext.Provider value={{

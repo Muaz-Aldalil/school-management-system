@@ -7,18 +7,15 @@ function getNested(obj, path) {
   return path.split('.').reduce((o, k) => (o && o[k] !== undefined ? o[k] : null), obj);
 }
 
-export function LanguageProvider({ children }) {
-  const [lang, setLangState] = useState(() => localStorage.getItem('lang') || 'ar');
+const LANG = 'ar';
 
-  const setLang = useCallback((l) => {
-    setLangState(l);
-    localStorage.setItem('lang', l);
-  }, []);
+export function LanguageProvider({ children }) {
+  const [lang] = useState(LANG);
 
   useEffect(() => {
-    document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
-    document.documentElement.lang = lang;
-  }, [lang]);
+    document.documentElement.dir = 'rtl';
+    document.documentElement.lang = LANG;
+  }, []);
 
   const t = useCallback((key, params = {}) => {
     const val = getNested(lang === 'ar' ? ar : en, key);
@@ -27,7 +24,7 @@ export function LanguageProvider({ children }) {
   }, [lang]);
 
   return (
-    <LanguageContext.Provider value={{ t, lang, setLang, dir: lang === 'ar' ? 'rtl' : 'ltr' }}>
+    <LanguageContext.Provider value={{ t, lang, dir: 'rtl' }}>
       {children}
     </LanguageContext.Provider>
   );

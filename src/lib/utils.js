@@ -43,7 +43,12 @@ export function getArabicNumber(num) {
 }
 
 export function formatDateSD(date, lang = 'ar') {
-  const d = date instanceof Date ? date : new Date(date);
+  let d = date instanceof Date ? date : null;
+  if (!d && typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    d = new Date(`${date}T00:00:00`);
+  } else if (!d) {
+    d = new Date(date);
+  }
   if (lang === 'ar') {
     return d.toLocaleDateString('ar-SD', { year: 'numeric', month: 'long', day: 'numeric' });
   }

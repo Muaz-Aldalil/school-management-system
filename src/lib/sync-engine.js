@@ -23,7 +23,7 @@ export function enqueue({ table, operation, data, recordId, baseVersion }) {
   });
 }
 
-function coalesceEntries(entries) {
+export function coalesceEntries(entries) {
   const byEntity = new Map();
   for (const e of entries) {
     const key = `${e.table}:${e.recordId || e.data?.id || 'new'}`;

@@ -3,7 +3,7 @@ import { useAuth } from './AuthContext';
 import { supabase, dbAvailable } from '../lib/supabase';
 import { getArabicScore } from '../lib/utils';
 import { uploadStudentPhoto, deleteStudentPhoto } from '../lib/storage';
-import { DEFAULT_SCHOOL_NAME } from '../lib/constants';
+import { DEFAULT_SCHOOL_NAME, normalizeSchoolName } from '../lib/constants';
 import { getAll, put, putMany, deleteRecord } from '../lib/offline-db';
 import { enqueue, removeByTableAndRecord } from '../lib/sync-engine';
 import { t } from '../lib/i18n';
@@ -95,7 +95,7 @@ async function fetchSchoolData(user) {
     grades: (gRes.data || []).map(normalizeGrade),
     payments: paymentsData,
     settings: { supervisors: settings.supervisors || [], accountants: settings.accountants || [] },
-    schoolInfo: { schoolName: settings.school_name || DEFAULT_SCHOOL_NAME, schoolAddress: settings.school_address || '', schoolPhone: settings.school_phone || '', adminName: settings.admin_name || '', adminEmail: settings.admin_email || '', schoolEmail: settings.school_email || '', schoolLogoUrl: settings.school_logo_url || '', academicYear: settings.academic_year || '', academicTerm: settings.academic_term || '', smsOn: settings.sms_on !== false, emailOn: settings.email_on === true },
+    schoolInfo: { schoolName: normalizeSchoolName(settings.school_name) || DEFAULT_SCHOOL_NAME, schoolAddress: settings.school_address || '', schoolPhone: settings.school_phone || '', adminName: settings.admin_name || '', adminEmail: settings.admin_email || '', schoolEmail: settings.school_email || '', schoolLogoUrl: settings.school_logo_url || '', academicYear: settings.academic_year || '', academicTerm: settings.academic_term || '', smsOn: settings.sms_on !== false, emailOn: settings.email_on === true },
     teacherAssignments: assignments,
     studentLinks: links,
     parentLinks,
@@ -289,6 +289,36 @@ export function SchoolProvider({ children }) {
     pendingIdsRef.current.add(id);
     return () => pendingIdsRef.current.delete(id);
   }, []);
+
+  const sendNotification = useCallback(async (message, targetRoles = ['admin']) => {
+    if (!message?.trim()) return;
+
+    const clientId = crypto.randomUUID();
+    const now = new Date().toISOString();
+
+    const optimistic = {
+      id: clientId, message: message.trim(),
+      school_id: schoolId || null, target_roles: targetRoles,
+      created_at: now,
+    };
+
+    await enqueue({
+      table: 'notifications',
+      operation: 'insert',
+      data: optimistic,
+      recordId: clientId,
+      baseVersion: now,
+    });
+
+    if (navigator.onLine && supabase) {
+      const { error } = await supabase.from('notifications').insert({
+        message: message.trim(),
+        school_id: schoolId || null,
+        target_roles: targetRoles,
+      });
+      if (error) throw error;
+    }
+  }, [schoolId]);
 
   // --- Mutations: offline-first with optimistic writes + outbox ---
 
@@ -750,36 +780,6 @@ export function SchoolProvider({ children }) {
       } catch { /* silent */ }
     }
   }, [user?.role]);
-
-  const sendNotification = useCallback(async (message, targetRoles = ['admin']) => {
-    if (!message?.trim()) return;
-
-    const clientId = crypto.randomUUID();
-    const now = new Date().toISOString();
-
-    const optimistic = {
-      id: clientId, message: message.trim(),
-      school_id: schoolId || null, target_roles: targetRoles,
-      created_at: now,
-    };
-
-    await enqueue({
-      table: 'notifications',
-      operation: 'insert',
-      data: optimistic,
-      recordId: clientId,
-      baseVersion: now,
-    });
-
-    if (navigator.onLine && supabase) {
-      const { error } = await supabase.from('notifications').insert({
-        message: message.trim(),
-        school_id: schoolId || null,
-        target_roles: targetRoles,
-      });
-      if (error) throw error;
-    }
-  }, [schoolId]);
 
   // --- Stats ---
   const stats = useMemo(() => {

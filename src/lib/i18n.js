@@ -3,7 +3,7 @@ import { en, ar } from '../i18n/translations';
 const langs = { en, ar };
 
 function getLang() {
-  try { return localStorage.getItem('lang') || 'ar'; } catch { return 'ar'; }
+  return 'ar';
 }
 
 export function t(key) {

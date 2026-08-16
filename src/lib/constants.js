@@ -1,6 +1,25 @@
 export const APP_VERSION = '1.0.0';
 export const DEFAULT_SCHOOL_NAME = 'مدرسه العامريه';
 
+const OLD_SCHOOL_NAMES = [
+  'مدرسه الاخلاء الخاصه',
+  'مدرسة الاخلاء الخاصه',
+  'مدرسه الاخلاء',
+  'مدرسة الاخلاء',
+  'الاخلاء',
+];
+
+export function normalizeSchoolName(value) {
+  if (typeof value !== 'string') return value;
+  return OLD_SCHOOL_NAMES.includes(value.trim()) ? DEFAULT_SCHOOL_NAME : value;
+}
+
+export function normalizeSchoolNameDeep(value) {
+  if (typeof value !== 'object' || value === null) return normalizeSchoolName(value);
+  if (Array.isArray(value)) return value.map(normalizeSchoolNameDeep);
+  return Object.fromEntries(Object.entries(value).map(([k, v]) => [k, normalizeSchoolNameDeep(v)]));
+}
+
 export const ACADEMIC_TERMS = [
   { value: 'الفصل الأول', en: '1st Term' },
   { value: 'الفصل الثاني', en: '2nd Term' },

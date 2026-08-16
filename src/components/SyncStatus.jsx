@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+﻿import { useState, useEffect, useCallback, useRef } from 'react';
 import { Wifi, WifiOff, RefreshCw, AlertTriangle, Check } from 'lucide-react';
 import { useLanguage } from '../context/LanguageContext';
 import { getPendingCount } from '../lib/offline-db';
@@ -12,6 +12,29 @@ export default function SyncStatus() {
   const [lastSync, setLastSync] = useState(null);
   const [syncing, setSyncing] = useState(false);
   const [authExpired, setAuthExpired] = useState(false);
+  const [pendingToast, setPendingToast] = useState(false);
+  const [syncedToast, setSyncedToast] = useState(false);
+  const pendingTimer = useRef(null);
+  const syncedTimer = useRef(null);
+
+  useEffect(() => {
+    if (pendingCount > 0) {
+      setPendingToast(true);
+      clearTimeout(pendingTimer.current);
+      pendingTimer.current = setTimeout(() => setPendingToast(false), 6000);
+    } else {
+      setPendingToast(false);
+    }
+    return () => clearTimeout(pendingTimer.current);
+  }, [pendingCount]);
+
+  useEffect(() => {
+    if (!lastSync) return;
+    setSyncedToast(true);
+    clearTimeout(syncedTimer.current);
+    syncedTimer.current = setTimeout(() => setSyncedToast(false), 4000);
+    return () => clearTimeout(syncedTimer.current);
+  }, [lastSync]);
 
   useEffect(() => {
     const interval = setInterval(async () => {
@@ -48,6 +71,9 @@ export default function SyncStatus() {
   const handleSync = useCallback(async () => {
     if (!online || syncing) return;
     setSyncing(true);
+    setPendingToast(true);
+    clearTimeout(pendingTimer.current);
+    pendingTimer.current = setTimeout(() => setPendingToast(false), 6000);
     try {
       await drainOutbox(supabase);
       setLastSync(new Date());
@@ -58,7 +84,7 @@ export default function SyncStatus() {
 
   if (authExpired) {
     return (
-      <div role="status" aria-live="polite" className="fixed bottom-4 start-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-warning/10 border border-warning/30 text-warning rounded-xl text-sm font-semibold shadow-lg backdrop-blur-sm">
+      <div role="status" aria-live="polite" className="fixed bottom-4 end-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-warning/10 border border-warning/30 text-warning rounded-xl text-sm font-semibold shadow-lg backdrop-blur-sm">
         <AlertTriangle className="w-4 h-4" />
         <span>{t('sync.sessionExpired')}</span>
       </div>
@@ -67,7 +93,7 @@ export default function SyncStatus() {
 
   if (!online) {
     return (
-      <div role="status" aria-live="assertive" className="fixed bottom-4 start-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-error/10 border border-error/30 text-error rounded-xl text-sm font-semibold shadow-lg backdrop-blur-sm animate-slide-up">
+      <div role="status" aria-live="assertive" className="fixed bottom-4 end-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-error/10 border border-error/30 text-error rounded-xl text-sm font-semibold shadow-lg backdrop-blur-sm animate-slide-up">
         <WifiOff className="w-4 h-4" />
         <span>{t('common.offline')}</span>
         {pendingCount > 0 && (
@@ -79,9 +105,9 @@ export default function SyncStatus() {
     );
   }
 
-  if (pendingCount > 0 || syncing) {
+  if ((pendingToast && pendingCount > 0) || syncing) {
     return (
-      <div role="status" aria-live="polite" className="fixed bottom-4 start-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-info/10 border border-info/30 text-info rounded-xl text-sm font-semibold shadow-lg backdrop-blur-sm">
+      <div role="status" aria-live="polite" className="fixed bottom-4 end-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-info/10 border border-info/30 text-info rounded-xl text-sm font-semibold shadow-lg backdrop-blur-sm">
         {syncing ? (
           <RefreshCw className="w-4 h-4 animate-spin" />
         ) : (
@@ -102,9 +128,9 @@ export default function SyncStatus() {
     );
   }
 
-  if (lastSync) {
+  if (syncedToast && lastSync) {
     return (
-      <div role="status" aria-live="polite" className="fixed bottom-4 start-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-success/10 border border-success/30 text-success rounded-xl text-sm font-semibold shadow-lg backdrop-blur-sm animate-slide-up">
+      <div role="status" aria-live="polite" className="fixed bottom-4 end-4 z-50 flex items-center gap-2 px-4 py-2.5 bg-success/10 border border-success/30 text-success rounded-xl text-sm font-semibold shadow-lg backdrop-blur-sm animate-slide-up">
         <Check className="w-4 h-4" />
         <span>{t('sync.allSynced')}</span>
         <span className="ms-2 text-xs opacity-60">
