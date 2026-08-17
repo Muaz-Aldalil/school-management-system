@@ -56,10 +56,10 @@ export default function Landing() {
       <Navbar />
       <Reveal><Hero /></Reveal>
       <Reveal><About /></Reveal>
+      <Reveal><Teachers /></Reveal>
       <Reveal><HonorBoard /></Reveal>
       <Reveal><Events /></Reveal>
       <Reveal><Achievements /></Reveal>
-      <Reveal><Teachers /></Reveal>
       <Reveal><Contact /></Reveal>
       <Reveal><Registration /></Reveal>
       <Footer />
