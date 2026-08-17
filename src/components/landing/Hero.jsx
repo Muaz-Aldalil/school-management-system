@@ -107,7 +107,7 @@ export default function Hero() {
       <div className="hidden md:block w-full overflow-hidden bg-background py-12 lg:py-24">
         <div className="container mx-auto grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-8 px-4 md:px-6">
           {/* Left column: text + actions + stats */}
-          <motion.div className="flex flex-col items-center text-center lg:items-start lg:text-left" variants={containerVariants} initial="hidden" animate="visible">
+          <motion.div className="flex flex-col items-center text-center" variants={containerVariants} initial="hidden" animate="visible">
             <motion.h1 className="text-4xl font-bold tracking-tight text-on-surface sm:text-6xl" variants={itemVariants}>
               {title}
             </motion.h1>
