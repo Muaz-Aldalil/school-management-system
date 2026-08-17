@@ -50,8 +50,8 @@ export default function Hero() {
 
   return (
     <section id="hero">
-      {/* ── Mobile hero (unchanged) ── */}
-      <div className="md:hidden relative min-h-[100dvh] pt-16 flex items-center overflow-hidden bg-background">
+      {/* ── Mobile + tablet hero (bg images) ── */}
+      <div className="lg:hidden relative min-h-[100dvh] pt-16 flex items-center overflow-hidden bg-background">
         <div className="absolute inset-0">
           {HERO_IMAGES.map((src, i) => (
             <div key={src} className={`absolute inset-0 bg-cover bg-center transition-opacity duration-1000 ${i === activeBg ? 'opacity-100' : 'opacity-0'}`} style={{ backgroundImage: `url(${src})` }} aria-hidden="true" />
@@ -103,8 +103,8 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* ── Desktop / tablet hero (two-column) ── */}
-      <div className="hidden md:block w-full overflow-hidden bg-background py-12 lg:py-24">
+      {/* ── Desktop hero (two-column) ── */}
+      <div className="hidden lg:block w-full overflow-hidden bg-background py-12 lg:py-24">
         <div className="container mx-auto grid grid-cols-1 items-center gap-12 lg:grid-cols-2 lg:gap-8 px-4 md:px-6">
           {/* Left column: text + actions + stats */}
           <motion.div className="flex flex-col items-center text-center" variants={containerVariants} initial="hidden" animate="visible">
