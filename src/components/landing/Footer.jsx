@@ -1,4 +1,4 @@
-import { School, Mail, Phone, MapPin } from 'lucide-react';
+import { School, Mail, MapPin, MessageCircle } from 'lucide-react';
 import { useLanding } from '../../context/LandingContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { localized } from '../../lib/localized';
@@ -40,7 +40,12 @@ export default function Footer() {
           <div>
             <h4 className="font-semibold mb-3">{t('footer.contact')}</h4>
             <ul className="space-y-2 text-sm text-secondary">
-              <li className="flex items-center gap-2"><Phone className="w-3.5 h-3.5" /> {contact.phone}</li>
+              <li>
+                <a href="https://wa.me/249912345678" target="_blank" rel="noopener noreferrer" className="flex items-center gap-2 hover:text-primary transition-colors">
+                  <MessageCircle className="w-3.5 h-3.5" />
+                  <span>مشرف المنصه, أ. علاء الدين — {contact.phone}</span>
+                </a>
+              </li>
               <li className="flex items-center gap-2"><Mail className="w-3.5 h-3.5" /> {contact.email}</li>
               <li className="flex items-center gap-2"><MapPin className="w-3.5 h-3.5" /> {localized(contact.address, lang)}</li>
             </ul>
