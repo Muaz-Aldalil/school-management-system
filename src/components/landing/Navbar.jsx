@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { School, Menu, X, Sun, Moon } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
-import { localized } from '../../lib/localized';
+
 import { useLanding } from '../../context/LandingContext';
 import useTheme from '../../hooks/useTheme';
 import useActiveSection from '../../hooks/useActiveSection';
@@ -11,8 +11,8 @@ import useActiveSection from '../../hooks/useActiveSection';
 export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { user } = useAuth();
-  const { t, lang } = useLanguage();
-  const { hero, sections } = useLanding();
+  const { t } = useLanguage();
+  const { sections } = useLanding();
   const { theme, toggle } = useTheme();
   const active = useActiveSection(['hero', 'about', 'events', 'contact', 'registration']);
   const regSection = sections.find(s => s.type === 'registration');
@@ -24,7 +24,7 @@ export default function Navbar() {
           <div className="hidden md:flex w-9 h-9 rounded-xl bg-primary items-center justify-center">
             <School className="w-5 h-5 text-on-primary" />
           </div>
-          <span className="text-lg font-bold text-primary">{localized(hero.title, lang)}</span>
+          <span className="text-lg font-bold text-primary">مدرسه العامريه الحكومية بنين</span>
         </a>
         <div className="hidden md:flex items-center gap-8">
           <a href="#hero" className={`relative text-sm font-semibold transition-colors ${active === 'hero' ? 'text-primary' : 'text-secondary hover:text-primary'}`}>
