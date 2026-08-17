@@ -88,7 +88,7 @@ const DEFAULT_ABOUT = {
   content: { ar: 'توفر مدرسة العامريه التعليم الجيد منذ أكثر من 50 عاماً. نؤمن بتدريب الأفراد المتكاملين من خلال منهج متوازن من الأكاديميين والفنون والرياضية. يعمل مجلسنا المتفاني بجد لإنشاء بيئة داعمة يمكن لكل طالب فيها أن يزدهر.', en: 'Al-Amiriya School has provided quality education for over 50 years. We believe in developing well-rounded individuals through a balanced curriculum of academics, arts, and sports. Our dedicated board works hard to create a supportive environment where every student can thrive.' },
   vision: { ar: 'تمكين كل طالب من تحقيق إمكاناته الكاملة كمتعلم مدى الحياة ومواطن عالمي مسؤول، مزود بالمهارات والشخصية لإحداث تأثير إيجابي في العالم.', en: 'To empower every student to reach their full potential as lifelong learners and responsible global citizens, equipped with the skills and character to make a positive impact on the world.' },
   image_url: '',
-  stats: { students: 1245, teachers: 85, years: 52, awards: 28 },
+  stats: { students: 800, teachers: 20, years: 52, awards: 28 },
 };
 
 const DEFAULT_CONTACT = {
