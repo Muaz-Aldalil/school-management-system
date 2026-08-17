@@ -56,7 +56,7 @@ export default function Hero() {
   }, []);
 
   return (
-    <section id="hero" className="relative min-h-[80vh] flex items-center overflow-hidden bg-background">
+    <section id="hero" className="relative min-h-[100dvh] md:min-h-[80vh] pt-16 flex items-center overflow-hidden bg-background">
       {/* Background images — all screen sizes */}
       <div className="absolute inset-0">
         {HERO_IMAGES.map((src, i) => (

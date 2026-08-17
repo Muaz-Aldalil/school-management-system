@@ -76,8 +76,8 @@ const DEFAULT_HERO = {
   video_url: '',
   image_url: '',
   stats: [
-    { value: 1245, label: { ar: 'الطلاب', en: 'Students' } },
-    { value: 85, label: { ar: 'المعلمين', en: 'Teachers' } },
+    { value: 800, label: { ar: 'الطلاب', en: 'Students' } },
+    { value: 20, label: { ar: 'المعلمين', en: 'Teachers' } },
     { value: 28, label: { ar: 'الجوائز', en: 'Awards' } },
     { value: 52, label: { ar: 'سنوات', en: 'Years' } },
   ],
