@@ -21,7 +21,7 @@ export default function Navbar() {
     <nav className="fixed top-0 left-0 right-0 z-50 bg-surface-container-lowest/60 backdrop-blur-xl border-b border-outline-variant">
       <div className="max-w-7xl mx-auto px-4 md:px-6 h-16 flex items-center justify-between">
         <a href="#hero" className="flex items-center gap-2.5">
-          <div className="w-9 h-9 rounded-xl bg-primary flex items-center justify-center">
+          <div className="hidden md:flex w-9 h-9 rounded-xl bg-primary items-center justify-center">
             <School className="w-5 h-5 text-on-primary" />
           </div>
           <span className="text-lg font-bold text-primary">{localized(hero.title, lang)}</span>
@@ -65,9 +65,6 @@ export default function Navbar() {
           )}
         </div>
         <div className="md:hidden flex items-center gap-2">
-          <button onClick={toggle} className="p-2.5 rounded-xl text-secondary hover:text-primary hover:bg-surface-container-low/50 backdrop-blur-sm transition-all" title={theme === 'light' ? t('nav.darkMode') : t('nav.lightMode')}>
-            {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
-          </button>
           <button className="p-2 text-secondary" onClick={() => setOpen(!open)}>
             {open ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -92,6 +89,12 @@ export default function Navbar() {
               {t('nav.register')}
             </a>
           )}
+          <div className="pt-2 border-t border-outline">
+            <button onClick={toggle} className="flex items-center gap-2 w-full text-sm font-semibold py-2 text-secondary hover:text-primary transition-colors">
+              {theme === 'light' ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+              {theme === 'light' ? t('nav.darkMode') : t('nav.lightMode')}
+            </button>
+          </div>
           <div className="pt-2 border-t border-outline">
             {user ? (
               <Link to={user.role === 'parent' ? '/parent' : user.role === 'student' ? '/student' : '/admin'} onClick={() => setOpen(false)} className="block text-center px-5 py-2 bg-primary text-on-primary rounded-xl text-sm font-semibold">{t('nav.dashboard')}</Link>
