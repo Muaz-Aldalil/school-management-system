@@ -10,6 +10,7 @@ import { drainOutbox } from './lib/sync-engine';
 import { supabase } from './lib/supabase';
 import { t } from './lib/i18n';
 import App from './App';
+import InstallOverlay from './components/InstallOverlay';
 import './index.css';
 import './styles/print.css';
 
@@ -70,6 +71,7 @@ createRoot(document.getElementById('root')).render(
           <LanguageProvider>
             <LandingProvider>
               <App />
+              <InstallOverlay />
             </LandingProvider>
           </LanguageProvider>
         </SchoolProvider>
